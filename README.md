@@ -2,9 +2,10 @@
 
 ## Construccion del sitio
 
-Este sitio es generado a traves de [docsify](https://docsify.js.org), herramienta
-que funciona a traves de NodeJS; la instalacion de estas herramientas es con los
-siguientes comandos:
+Este sitio es generado a traves de [docsify](https://docsify.js.org), una herramienta
+para la generacion de sitios estaticos como otros que se pueden encontrar en
+[staticgen.com](https://www.staticgen.com/), herramienta que funciona a traves de
+NodeJS; la instalacion de estas herramientas es con los siguientes comandos:
 
 ```bash
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
