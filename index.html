@@ -11,6 +11,8 @@
   <!-- docsify-themeable styles-->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify-themeable@latest/dist/css/theme-simple.css" title="light">
   <link rel="stylesheet alternative" href="https://cdn.jsdelivr.net/npm/docsify-themeable@latest/dist/css/theme-simple-dark.css" title="dark">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.28.0/moment.min.js" integrity="sha512-Q1f3TS3vSt1jQ8AwP2OuenztnLU6LwxgyyYOG1jgMW/cbEMHps/3wjvnl1P3WTrF3chJUWEoxDUEjMxDV8pujg==" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.28.0/locale/es.min.js" integrity="sha512-/HmEBBS8qan4uG3ClUfdNMUOprD0g4BNcJnOBh153mBMs16U92xULl8QS9A37/vLW17epcNp0t0fDOYWjpG73Q==" crossorigin="anonymous"></script>
 </head>
 <body>
   <div id="app"></div>
@@ -19,6 +21,20 @@
       name: 'Pagina de Luis',
       repo: 'luis-mx/luis-mx.github.io',
       loadSidebar: true,
+      formatUpdated: function(time) {
+        return moment(time).calendar();
+      },
+      plugins: [
+        function(hook, vm) {
+          hook.beforeEach(function(html) {
+            return (
+              html +
+              '\n----\n' +
+              'Ultima modificación: {docsify-updated}'
+            );
+          });
+        }
+      ],
       copyCode: {
         buttonText : 'Copiar',
         errorText  : 'Error',
@@ -60,23 +76,6 @@
           toogleImage : 'url(https://cdn.jsdelivr.net/npm/docsify-darklight-theme@latest/icons/moon.svg)'
         }
       },
-      plugins: [
-        function(hook, vm) {
-          hook.beforeEach(function(html) {
-            var url =
-              'https://github.com/luis-mx/luis-mx.github.io/blob/master/' +
-              vm.route.file;
-            var editHtml = '[📝 EDIT DOCUMENT](' + url + ')\n';
-
-            return (
-              editHtml +
-              html +
-              '\n----\n' +
-              'Last modified {docsify-updated}'
-            );
-          });
-        }
-      ]
     }
   </script>
   <script src="//cdn.jsdelivr.net/npm/docsify/lib/docsify.min.js"></script>
