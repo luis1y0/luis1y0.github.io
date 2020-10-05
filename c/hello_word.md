@@ -7,6 +7,7 @@ Generar un archivo llamado `main.c` y agregar el siguiente texto:
 
 int main() {
   printf("Hola mundo");
+  return 0;
 }
 ```
 
