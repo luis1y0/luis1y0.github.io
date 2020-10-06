@@ -18,4 +18,4 @@ sudo apt install gcc cmake
 En Windows se haria uso de [MinGW](http://mingw-w64.org/doku.php/download) que significa "Minimalist GNU for Windows" y
 funciona nativamente en windows siendo no compatible con el entorno de ejecucion POSIX; otra opción es
 [Cygwin](https://cygwin.com/install.html) que pretende proveer una capa POSIX permitiendo generar un ejecutable en
-windoes con el mismo codigo fuente para sistemas UNIX. 
+windows con el mismo codigo fuente para sistemas UNIX. 
