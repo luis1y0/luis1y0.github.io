@@ -1,6 +1,3 @@
 # Sitio Personal
 
-## Subtitulo
-
-Parrafo
-
+Anotaciones personales útiles para mí en mi trabajo diario.
