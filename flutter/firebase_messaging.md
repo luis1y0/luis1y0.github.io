@@ -1,6 +1,6 @@
 # Notificaciones Push en Flutter
 
-## Integración en Flutter 1.12 con v2 Android embedding
+## Flutter version => 1.12 con v2 Android embedding
 
 Acceder a Firebase y registrar el paquete de la aplicación. Agregar en la ruta
 `android/app/google-services.json` la configuracion de firebase.
@@ -56,35 +56,41 @@ En el `AndroidManifest` agregar el siguiente intent filter dentro de la etiqueta
 En el archivo `pubspec.yml` agregar las siguientes dependencias:
 
 ```
-firebase_messaging: ^7.0.3
-firebase_core: ^0.5.0+1
+firebase_messaging: ^8.0.0-dev.14
+firebase_core: ^0.7.0
 ```
 
 Una vez eso hecho se puede remplazar el codigo dentro de archivo `main.dart` por
 el siguiente fragmento codigo para imprimir un mensaje cuando llegue una
-notificacion solo si la aplicacion se encuentra en primer plano, en segundo
-plano solo se recibe una notificacion en la barra de notificaciones pero no es
-posible ejecutar codigo dart aun:
+notificacion en segundo y primer plano:
 
 ```dart
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 
+Future escuchadorEnSegundoPlano(RemoteMessage message) async {
+  print('>>>>>>>>>>>>> Llegando en segundo plano la notificiacion: $message, aqui se puede ejecutar cualquier codigo que sea necesario.');
+  return null;
+}
+
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  FirebaseMessaging.instance.setAutoInitEnabled(true);
+  FirebaseMessaging.instance.getToken().then(print);
+  FirebaseMessaging.onBackgroundMessage(escuchadorEnSegundoPlano);
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+    print('>>>>>>>>>>>>> Acaba de llegarme una notificacion con los siguientes datos $message');
+    return null;
+  }
+  );
   runApp(Aplicacion());
 }
 
 class Aplicacion extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    FirebaseMessaging messaging = FirebaseMessaging();
-    messaging.getToken().then(print);
-    messaging.configure(
-      onMessage: (Map<String, dynamic> message) async {
-        print('Acaba de llegarme una notificacion con los siguientes datos $message');
-        return null;
-      }
-    );
     return CupertinoApp(
       title: 'FCM Demo',
       home: HomeScreen(),
@@ -109,5 +115,5 @@ class HomeScreen extends StatelessWidget {
 
 ```
 
-Ultima actualizacion: 22 de abril
+Ultima actualizacion: 23 de abril
 
