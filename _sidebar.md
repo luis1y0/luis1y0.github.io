@@ -1,6 +1,7 @@
 <!-- _sidebar.md -->
 
 * [Home](/)
+* [Dart](/dart/README.md)
 * [Flutter](/flutter/README.md)
   * [Firebase Push Notifications](/flutter/firebase_messaging.md)
 * [Node](/node/README.md)
