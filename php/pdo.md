@@ -14,7 +14,7 @@ motor de base de datos. Para este ejemplo se usara la implementacion de
 Al parecer la imagen de bitnami para Maria DB es un poco mas ligera, asi que
 es buena opcion para pruebas de desarrollo, se puede descargar con este comando:
 
-```shell
+```bash
 docker pull bitnami/mariadb
 ```
 
@@ -22,7 +22,7 @@ Por defecto esta imagen contiene el usuario root al cual podemos establecer
 por ejemplo de password la palabra `root` y como nombre de base de datos
 `places_db` para probar con esste comando:
 
-```shell
+```bash
 docker run -d --name mariadb -e MARIADB_ROOT_PASSWORD=root -e MARIADB_DATABASE=places_db --network red-backend bitnami/mariadb
 ```
 
@@ -50,7 +50,7 @@ Para ejecutar el script dentro del contenedor de mariadb se puede copiar
 el archivo sql dentro del contenedor de mariadb, con esto se accede al
 contenedor y se ejecuta el script con los siguientes comandos:
 
-```shell
+```bash
 docker cp inserts.sql mariadb:/inserts.sql
 docker exec -it mariadb bash
 mysql -u root -p places_db < inserts.sql

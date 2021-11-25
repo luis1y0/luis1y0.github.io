@@ -5,7 +5,7 @@
 Para uso en desarrollo con alpine se puede descargar la imagen con docker pull
 y al listarla el espacio ocupado es de menos de 100 MB;
 
-```shell
+```bash
 docker pull php:alpine
 ```
 
@@ -24,14 +24,14 @@ para facilitar la conexion entre diferentes contenedores de docker, aunque no
 se recomienda usar una red bridge, en mi entorno de desarrollo creare una de
 este tipo con el siguiente comando:
 
-```shell
+```bash
 docker network create --driver bridge red-backend
 ```
 
 Para ejecutar ese codigo desde la terminal en la misma carpeta donde se
 encuentra el archivo `index.php` ejecuto el siguiente comando de docker:
 
-```shell
+```bash
 docker run -d -p 8000:8000 --name backend-php -v "$PWD":/usr/src/myapp -w /usr/src/myapp --network red-backend php:alpine php -S 0.0.0.0:8000 index.php
 ```
 
