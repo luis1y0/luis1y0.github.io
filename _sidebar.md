@@ -2,6 +2,7 @@
 
 * [Home](/)
 * [Cheat Sheet](/cheatsheet.md)
+* [Java](/java/README.md)
 * [Dart](/dart/README.md)
 * [Flutter](/flutter/README.md)
   * [Firebase Push Notifications](/flutter/firebase_messaging.md)
