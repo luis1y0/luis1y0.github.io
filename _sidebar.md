@@ -1,6 +1,7 @@
 <!-- _sidebar.md -->
 
 * [Home](/)
+* [Cheat Sheet](/cheatsheet.md)
 * [Dart](/dart/README.md)
 * [Flutter](/flutter/README.md)
   * [Firebase Push Notifications](/flutter/firebase_messaging.md)
