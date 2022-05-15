@@ -42,7 +42,7 @@ class Person {
     
     public void setAge(int age) throws Exception {
         if (age < 0) {
-            throw Exception("Negative values not allowed");
+            throw new Exception("Negative values not allowed");
         }
         this.age = age;
     }
