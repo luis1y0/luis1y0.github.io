@@ -7,7 +7,7 @@ Creacion de una base de datos:
 ```sql
 CREATE DATABASE <name> CHARACTER SET utf8mb4;
 CREATE USER '<user_name>'@'%' IDENTIFIED BY '<password_value>';
-GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON *.* TO '<user_name>'@'%' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
 ```
 
