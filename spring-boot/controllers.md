@@ -147,14 +147,74 @@ public String getData(
 
 ## Cuerpo de solicitud HTTP
 
+Una solicitud http tiene la siguiente estructura:
+
+```
+GET / HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "some title",
+  "author": "some author",
+  "price": 450.0
+}
+```
+
+Comienza con una linea en donde se especifica el método HTTP, separado
+con un espacio de la ruta a la que se hace la petición y de la versión del
+protocolo HTTP que se esta usando.
+
+Las siguientes lineas representan los `headers`, los headers se terminan
+cuando hay una linea en blanco, despues de esa linea en blanco se encuentra
+el cuerpo de la solicitud.
+
+Para poder acceder al cuerpo de una solicitud en Spring se usa la anotación
+`@RequestBody`, en base a los campos del json llena los campos del objeto que
+coinciden en el nombre:
+
+```java
+@PostMapping("/books", produces = "application/json")
+public Book addBook(@RequestBody Book book) {
+  return addNewBook(book);
+}
+```
+
+Usando la anotación @RequestBody solo se accede al cuerpo de la peticion, pero
+para poder acceder a los headers y todos los datos de la peticion, se agrega
+un parametro de tipo `HttpEntity<T>` donde T podemos especificar un tipo de dato
+que esperamos leer del cuerpo de la petición, la siguiente petición es
+equivalente a la aneterior, solo que ya se puede acceder a todos los datos de la
+petición:
+
+```java
+@PostMapping("/books", produces = "application/json")
+public Book addBook(HttpEntity<Book> entity) {
+  entity.getHeaders();
+  entity.hasBody();
+  return addNewBook(entity.getBody(););
+}
+```
+
 ## Consumiendo la API
 
 ```html
-<form>
+<form action="/books" method="post">
+  <label for="title">Title:</label><br>
+  <input type="text" id="title" name="title"><br>
+  <label for="author">Author:</label><br>
+  <input type="text" id="author" name="author"><br><br>
+  <label for="price">Price:</label><br>
+  <input type="text" id="price" name="price"><br><br>
+  <input type="submit" value="Enviar">
 </form>
 ```
 
 ```javascript
-fetch("url").then(response => response.json());
+function getBooks() {
+  fetch("/books")
+    .then(response => response.json())
+    .then(books => console.log(books));
+}
 ```
 

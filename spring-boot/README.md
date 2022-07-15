@@ -42,3 +42,10 @@ Ademas usando una convencion de nombre como application.dev.properties
 se pueden establecer los valores a usar dependiendo de si se trabaja en
 en local, produccion u otros entornos.
 
+## Configurar los CORS
+
+## DevTools
+
+DevTools ayuda a poder probar el codigo mas rapido al hacer modificaciones
+sin tener la necesidad de compilar de nuevo y volver a iniciar el servidor.
+
