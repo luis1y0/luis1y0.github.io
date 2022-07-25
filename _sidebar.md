@@ -7,6 +7,7 @@
 * [Spring Boot](/spring-boot/README.md)
   * [Controladores](/spring-boot/controllers.md)
 * [Angular](/angular/README.md)
+  * [Quick Start](/angular/quick-start.md)
 * [Dart](/dart/README.md)
 * [Flutter](/flutter/README.md)
   * [Firebase Push Notifications](/flutter/firebase_messaging.md)
