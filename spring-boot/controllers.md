@@ -117,25 +117,24 @@ public class ClassName {
  del parametro y un valor por defecto en caso de que el parametro este ausente
  en la url:
 ```java
-@GetMapping("search")
-public String getData(
-  @RequestParam("pagina", defaultValue=1) int page,
-  @RequestParam("por_pagina", defaultValue=10) int perPage
-) {
-  String formattedText = "Mostrando %d elementos de la pagina %d";
-  return String.format(formattedText, perPage, page);
-}
+  @GetMapping("search")
+  public String getData(
+     @RequestParam("pagina", defaultValue=1) int page,
+     @RequestParam("por_pagina", defaultValue=10) int perPage
+  ) {
+     String formattedText = "Mostrando %d elementos de la pagina %d";
+     return String.format(formattedText, perPage, page);
+  }
 ```
 Si se quiere obtener todos los parametros en una sola variable, se puede
 declarar un parametro de tipo `Map<String, String>` y la anotacion
 `@RequestParam` sin especificar un identificador o nombre de parametro.
 ```java
-@GetMapping("search")
-public String getData(
-  @RequestParam Map<String, String> params) {
-  String formattedText = "Mostrando %d elementos de la pagina %d";
-  return String.format(formattedText, params.get("per_page"), params.get("page"));
-}
+  @GetMapping("search")
+  public String getData(@RequestParam Map<String, String> params) {
+     String formattedText = "Mostrando %d elementos de la pagina %d";
+     return String.format(formattedText, params.get("per_page"), params.get("page"));
+  }
 ```
 
  - Los headers pueden accesarse igual que los parametros del query string, se
