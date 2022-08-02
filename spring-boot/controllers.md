@@ -205,7 +205,7 @@ public String getData(
 }
 ```
 
-## Cuerpo de solicitud HTTP
+## Formato de solicitud HTTP
 
 Una solicitud http tiene la siguiente estructura:
 
@@ -257,9 +257,48 @@ public Book addBook(HttpEntity<Book> entity) {
 }
 ```
 
+## Respuestas HTTP
+
+Hay dos formas de crear una respuesta HTTP, una es devolviendo un tipo de dato
+en el method handler que se convierte a un formato que pueda ser escrito en el
+body, los headers y linea de inicio son generados automaticamente:
+
+```java
+@GetMapping("/books", produces = "application/json")
+public Book getBooks() {
+  return new Book();
+}
+```
+
+La otra forma es devolver un tipo `ResponseEntity<T>` donde T es el tipo de
+dato que sera escrito en el body de la respuesta HTTP. Con un objeto de tipo
+ResponseEntity se puede controlar el codigo de estado de respuesta y los
+headers:
+
+```java
+@RequestMapping("/handle")
+public ResponseEntity<String> handle() {
+  URI location = new URI();
+  HttpHeaders responseHeaders = new HttpHeaders();
+  responseHeaders.setLocation(location);
+  responseHeaders.set("MyResponseHeader", "MyValue");
+  return new ResponseEntity<String>("Hello World", responseHeaders, HttpStatus.CREATED);
+}
+```
+
 ## Consumiendo la API
 
+Envio de datos desde un formulario:
+
 ```html
+<!--
+<form
+    action="https://www.google.com"
+    method="POST" // por defecto GET
+    enctype="application/x-www-form-urlencoded" // valor por defecto
+    enctype="text/plain"
+    enctype="multipart/form-data">
+-->
 <form action="/books" method="post">
   <label for="title">Title:</label><br>
   <input type="text" id="title" name="title"><br>
@@ -270,6 +309,8 @@ public Book addBook(HttpEntity<Book> entity) {
   <input type="submit" value="Enviar">
 </form>
 ```
+
+Peticion HTTP desde javascript:
 
 ```javascript
 function getBooks() {
