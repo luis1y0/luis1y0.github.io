@@ -98,6 +98,66 @@ public class ClassName {
 }
 ```
 
+## Estructura de una peticion HTTP
+
+![Partes de una peticion HTTP](../images/http-diagram.png)
+
+ - Los verbos HTTP se filtran a traves de las anotaciones que descienden de
+ `@RequestMapping`. Como es `@GetMapping`, `@PostMapping`, `@PutMapping`,
+ `@DeleteMapping` y `@PatchMapping`, una de estas anotaciones se agrega a un
+ metodo, ese metodo es llamado **Method handler** (metodo manejador).
+
+ - La ruta o endpoint se agrega como parametros de las anotaciones de tipo
+ `@RequestMapping("<ruta o endpoint>")`.
+
+ - El **Query String** se extrae en Spring a traves de los parametros del
+ del method handler, por cada campo del query string, se agrega un parametro del
+ tipo correspondiente y una anotación
+ `@RequestParam(<nombre>, defaultValue=<valor>)` en la que se indica el nombre
+ del parametro y un valor por defecto en caso de que el parametro este ausente
+ en la url:
+```java
+@GetMapping("search")
+public String getData(
+  @RequestParam("pagina", defaultValue=1) int page,
+  @RequestParam("por_pagina", defaultValue=10) int perPage
+) {
+  String formattedText = "Mostrando %d elementos de la pagina %d";
+  return String.format(formattedText, perPage, page);
+}
+```
+Si se quiere obtener todos los parametros en una sola variable, se puede
+declarar un parametro de tipo `Map<String, String>` y la anotacion
+`@RequestParam` sin especificar un identificador o nombre de parametro.
+```java
+@GetMapping("search")
+public String getData(
+  @RequestParam Map<String, String> params) {
+  String formattedText = "Mostrando %d elementos de la pagina %d";
+  return String.format(formattedText, params.get("per_page"), params.get("page"));
+}
+```
+
+ - Los headers pueden accesarse igual que los parametros del query string, se
+ usa la anotación `@RequestHeader(<nombre>)` en un parametro de tipo String,
+ si el tipo es diferente de String se aplica una conversión automatica. Si no se
+ especifica un nombre de header y el tipo de dato del parametro del metodo
+ manejador es `Map<String, String>`, entonces el parametro recibe todos los
+ headers en ese parametro. Hay un tipo especial de Header que guarda una lista
+ de cookies, se puede accesar a cada cookie con la anotación
+ `@CookieValue(<nombre>)`.
+
+ - Para accesar al body de la petición, se debe anotar un parametro de **method handler** con la anotación `@ResponseBody` y spring leera el body
+lo deserializara dentro de un objeto del tipo que se especifique en el
+parametro. Si el body de la peticion es **multipart**, se puede usar la
+anotación `@RequestPart(<nombre de parte>)`, se usa igual que response body.
+Si se quiere leer un body o una parte como archivo, se puede especificar la
+interface `MultipartFile` como tipo del parametro del method handler, esta
+interface viene del paquete `org.springframework.web.multipart`. Si deseas
+acceder a la lista de todos los archivos en un body multipart puedes anotar
+un parametro con `@RequestParam` sin especificar un nombre en la anotación y
+especificando `Map<String, MultipartFile>` como tipo del parametro.
+
 ## Mapeando metodos HTTP
 
 En un controlador, la ruta y el metodo HTTP a escuchar se configura a tráves
@@ -150,8 +210,9 @@ public String getData(
 Una solicitud http tiene la siguiente estructura:
 
 ```
-GET / HTTP/1.1
+POST /api/v1/books HTTP/1.1
 Content-Type: application/json
+Content-Length: 72
 Accept: application/json
 
 {
