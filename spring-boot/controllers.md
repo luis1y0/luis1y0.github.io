@@ -146,16 +146,89 @@ declarar un parametro de tipo `Map<String, String>` y la anotacion
  de cookies, se puede accesar a cada cookie con la anotación
  `@CookieValue(<nombre>)`.
 
- - Para accesar al body de la petición, se debe anotar un parametro de **method handler** con la anotación `@ResponseBody` y spring leera el body
-lo deserializara dentro de un objeto del tipo que se especifique en el
-parametro. Si el body de la peticion es **multipart**, se puede usar la
-anotación `@RequestPart(<nombre de parte>)`, se usa igual que response body.
+ - Para accesar al body de la siguiente petición:
+```
+  POST /api/v1/ruta HTTP/1.1
+  Host: localhost:8080
+  Content-Type: text/plain
+  Content-Length: 18
+
+  contenido del body
+```
+Se debe anotar un parametro del **method handler** con la anotación
+`@RequestBody` y spring leera el body lo deserializara dentro de un objeto
+del tipo que se especifique en el parametro:
+```java
+  @PostMapping("/api/v1/ruta")
+  public String getData(@RequestBody String body) {
+     // la variable <body> tiene el valor "contenido del body"
+     String formattedText = "Valor %s";
+     return String.format(formattedText, body);
+  }
+```
+Hay otro tipo de body usado especialmente cuando se envian archivos porque
+permite combinar los campos de archivo con campos de datos simples como texto,
+ese tipo de body se llama **multipart** y por ejemplo se puede generar con el
+siguiente formulario HTML un multipart con un texto y un archivo en la misma
+petición:
+```html
+  <!DOCTYPE html>
+  <html>
+  <head><title>Formulario</title></head>
+  <body>
+    <form
+      method="POST"
+      action="/api/v1/ruta"
+      enctype="multipart/form-data">
+      <input type="text" name="nombre">
+      <input type="file" name="archivo">
+      <input type="submit">
+    </form>
+  </body>
+  </html>
+```
+El formulario anterior genera la siguiente peticion HTTP (simplificada):
+```
+   POST /api/v1/ruta HTTP/1.1
+   Host: localhost:8080
+   Content-Length: 288
+   Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryoqCCAZrc6DaOAXAN
+    
+   ------WebKitFormBoundaryoqCCAZrc6DaOAXAN
+   Content-Disposition: form-data; name="nombre"
+
+   luis
+   ------WebKitFormBoundaryoqCCAZrc6DaOAXAN
+   Content-Disposition: form-data; name="archivo"; filename="documento.txt"
+   Content-Type: text/plain
+
+   contenido del archivo, solo una linea
+   ------WebKitFormBoundaryoqCCAZrc6DaOAXAN--
+```
+Si el body de la peticion es **multipart**, se puede usar la
+anotación `@RequestParam(<nombre de parte>)`, se usa igual que request body.
 Si se quiere leer un body o una parte como archivo, se puede especificar la
-interface `MultipartFile` como tipo del parametro del method handler, esta
-interface viene del paquete `org.springframework.web.multipart`. Si deseas
-acceder a la lista de todos los archivos en un body multipart puedes anotar
-un parametro con `@RequestParam` sin especificar un nombre en la anotación y
-especificando `Map<String, MultipartFile>` como tipo del parametro.
+interface `MultipartFile` como tipo del parametro del method handler:
+```java
+  @PostMapping("/api/v1/ruta")
+  public String getData(@RequestParam("nombre") String name, @RequestParam("archivo") MultipartFile file) {
+     String formattedText = "El nombre es %s, y el nombre del archivo es %s";
+     return String.format(formattedText, name, file.getName());
+  }
+```
+Lo anterior devolvera una respuesta parecida a esta:
+```
+   HTTP/1.1 200 OK
+   Content-Length: 59
+   Content-Type: text/plain
+    
+   El nombre es luis, y el nombre del archivo es documento.txt
+```
+Si deseas acceder a la lista de todos los campos que sean alamacenados como
+texto se puede usar la anotacion `@RequestParam` sin especitcar un nombre de
+campo y usando el tipo de dato `Map<String, String>`. En cambio si se quiere
+acceder a todos los archivos del formulario solo cambias el tipo de dato a
+`Map<String, MultipartFile>` como tipo del parametro.
 
 ## Mapeando metodos HTTP
 
