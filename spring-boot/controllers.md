@@ -358,7 +358,75 @@ public ResponseEntity<String> handle() {
 }
 ```
 
+## Conversiones de tipos complejos
+
+Al decir tipo complejo es hablar de tipos de datos que no son simples como
+Integer, String, Boolean, Double; o estructuras de datos comunes como
+List<T> o Map<K,V>, se refiere a otro tipo de datos o clases que podemos
+generar mientras programamos.
+
+Por ejemplo, podemos trabajar con objetos que representan la informacion de los usuarios
+de nuestro backend y posiblemente tendremos una clase como la siguiente:
+
+```java
+public class User {
+  private String firstName;
+  private String lastName;
+  private int age;
+  private String email;
+  
+  // setter y getters por cada campo
+}
+```
+
+Spring usa la reflexion para generar la estructura de un json/xml para todos
+los campos que tengan generado apropiadamente sus getters/setters haciendo una
+conversion automatica hacia o desde json/xml cuando lee datos del body de una
+peticion HTTP `@RequestBody` o cuando genera el body una respuesta HTTP
+`@ResponseBody`.
+
+Entonces si el cliente envia una peticion como esta:
+
+```
+POST /api/v1/users HTTP/1.1
+Content-Type: application/json
+Content-Length: 72
+Accept: application/json
+
+{
+  "firstName": "",
+  "lastName": "",
+  "age": 18
+  "email": ""
+}
+```
+
+El body anterior se puede interpretar como un clave valor Map<String, Object>
+en un method handler como el que sigue:
+
+```java
+@PostMapping("/api/v1/users")
+public String addUser(@RequestBody Map<String, Object> user) {
+  return user.get("firstName");
+}
+```
+
+Se usa como clave String porque en JSON siempre en la clave se usa un dato
+String mientras que para el valor se usa el tipo Object para indicar que
+puede ser de cualquier tipo: Integer, String, Boolean, Double, List, Map, etc.
+
+Pero tambien se puede decir que el tipo de dato es User:
+
+```java
+@PostMapping("/api/v1/users")
+public String addUser(@RequestBody User user) {
+  return user.getFirstName();
+}
+```
+
 ## Consumiendo la API
+
+Usando un cliente http como Postman o insomnia.
 
 Envio de datos desde un formulario:
 
