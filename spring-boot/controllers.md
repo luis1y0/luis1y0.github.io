@@ -17,6 +17,12 @@ vista renderizar, por defecto se usa `JSP`, pero si se agrega la dependencia de
 y buscar en la ruta `src/main/java/resources/templates/` un archivo llamado
 `file-name.html`:
 
+<!-- tabs:start -->
+
+#### **ClassName.java**
+
+src/main/java/package
+
 ```java
 @Controller
 @RequestMapping("/")
@@ -27,6 +33,53 @@ public class ClassName {
   }
 }
 ```
+
+#### **file-name.html**
+
+src/main/resources/templates
+
+```html
+<html>
+<body>
+  <p>Pagina index</p>
+</body>
+</html>
+```
+
+<!-- tabs:end -->
+
+Con el controlador anterior, esta seria la solicitud que un cliente realizaria
+y la respuesta obtenida:
+
+<!-- tabs:start -->
+
+#### **Request**
+
+http://localhost:8080/index
+
+```
+GET /index HTTP/1.1
+
+
+```
+
+#### **Response**
+
+
+
+```
+HTTP/1.1 200 OK
+Content-Type: text/html
+Content-Length: 51
+
+<html>
+<body>
+  <p>Pagina index</p>
+</body>
+</html>
+```
+
+<!-- tabs:end -->
 
 En el caso de usar @RestController, lo que regresan los metodos de la clase es
 lo que directamente se transforma en el cuerpo de la respuesta HTTP, si el tipo
@@ -39,28 +92,89 @@ tipicamente:
 @RestController
 @RequestMapping
 public class ClassName {
-  @Autowired
-  UserService userService;
+
   @GetMapping("/users/length")
   public int getNumberOfUsers() {
-    // si se devuelve un primitivo, el valor en texto sera devuelto directamente
-    // en el cuerpo de la respuesta HTTP
-    return this.userService.getUsers().length;
+    return 5;
   }
+  
   @GetMapping("/users/{id}")
   public User getUserById(@PathVariable int id) {
-    // Cuando es un objeto no primitivo, se convierte automaticamente en una
-    // estructura clave valor en base a los campos de clase: {"age": 25}
-    return this.userService.getUserById(id);
+    return Map.of(
+      "id", id,
+      "name", "Juan",
+      "age", 18
+    );
   }
+  
   @GetMapping("/users")
-  public ArrayList<User> getBook(@PathVariable int id) {
-    // Si es una coleccion de clases, automaticamente se genera un arreglo
-    // con los elementos representados como clave valor: [{"age": 18}, {"age": 25}]
-    return this.userService.getUsers();
+  public ArrayList<User> getUsers() {
+    return List.of(
+      Map.of("id", 1, "name", "Juan", "age", 18),
+      Map.of("id", 2, "name", "Maria", "age", 20),
+      Map.of("id", 3, "name", "Pablo", "age", 25)
+    );
   }
 }
 ```
+
+<!-- tabs:start -->
+
+#### **/users/length**
+
+http://localhost:8080/users/length
+
+```Request
+GET /users/length HTTP/1.1
+
+
+```
+
+```Response
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 1
+
+5
+```
+
+#### **/users/34**
+
+http://localhost:8080/users/34
+
+```Request
+GET /users/34 HTTP/1.1
+
+
+```
+
+```Response
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 32
+
+{"id":34,"name":"Juan","age":18}
+```
+
+#### **/users**
+
+http://localhost:8080/users
+
+```Request
+GET /users HTTP/1.1
+
+
+```
+
+```Response
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 99
+
+[{"id":1,"name":"Juan","age":18},{"id":2,"name":"Maria","age":20},{"id":3,"name":"Pablo","age":25}]
+```
+
+<!-- tabs:end -->
 
 @RestController fue introducido en Spring 4.0 para 
 simplificar la creacion de servicios web RESTful (es un anotacion
@@ -71,53 +185,62 @@ Despues de clasificar a una clase con @RestController se debe indicar la ruta
 base a partir de la cual todos los metodos de la clase usan, si no se
 especifica, el valor es un string vacio que igual a la raiz de la ruta HTTP.
 
-Este controlador usando @Controller:
+Las siguientes 2 clases generan el mismo resultado:
+
+<!-- tabs:start -->
+
+#### **Controller.java**
+
+src/main/java/package
 
 ```java
 @Controller
-@RequestMapping("books")
-public class ClassName {
-  @GetMapping("/{id}", produces = "application/json")
-  public @ResponseBody Book getBook(@PathVariable int id) {
-    return findBookById(id);
+@RequestMapping("/api/v1")
+public class Controller {
+  @GetMapping("/result")
+  public @ResponseBody Boolean getResult() {
+    return true;
   }
 }
 ```
 
-Es equivalente a usar @RestController:
+#### **RestController.java**
+
+src/main/java/package
 
 ```java
 @RestController
-// @RequestMapping("ruta", produces = {MediaType.APPLICATION_JSON_VALUE})
-@RequestMapping
-public class ClassName {
-  @GetMapping("/{id}", produces = "application/json")
-  public Book getBook(@PathVariable int id) {
-    return findBookById(id);
+@RequestMapping("/api/v1")
+public class RestController {
+  @GetMapping("/result")
+  public Boolean getResult() {
+    return true;
   }
 }
 ```
+
+<!-- tabs:end -->
 
 ## Estructura de una peticion HTTP
 
 ![Partes de una peticion HTTP](../images/http-diagram.png)
 
- - Los verbos HTTP se filtran a traves de las anotaciones que descienden de
+1. Los verbos HTTP se filtran a traves de las anotaciones que descienden de
  `@RequestMapping`. Como es `@GetMapping`, `@PostMapping`, `@PutMapping`,
  `@DeleteMapping` y `@PatchMapping`, una de estas anotaciones se agrega a un
  metodo, ese metodo es llamado **Method handler** (metodo manejador).
 
- - La ruta o endpoint se agrega como parametros de las anotaciones de tipo
+2. La ruta o endpoint se agrega como parametros de las anotaciones de tipo
  `@RequestMapping("<ruta o endpoint>")`.
 
- - El **Query String** se extrae en Spring a traves de los parametros del
+3. El **Query String** se extrae en Spring a traves de los parametros del
  del method handler, por cada campo del query string, se agrega un parametro del
  tipo correspondiente y una anotación
  `@RequestParam(<nombre>, defaultValue=<valor>)` en la que se indica el nombre
  del parametro y un valor por defecto en caso de que el parametro este ausente
  en la url:
 ```java
-  @GetMapping("search")
+  @GetMapping("/api/v1/books")
   public String getData(
      @RequestParam("pagina", defaultValue=1) int page,
      @RequestParam("por_pagina", defaultValue=10) int perPage
@@ -130,14 +253,38 @@ Si se quiere obtener todos los parametros en una sola variable, se puede
 declarar un parametro de tipo `Map<String, String>` y la anotacion
 `@RequestParam` sin especificar un identificador o nombre de parametro.
 ```java
-  @GetMapping("search")
+  @GetMapping("/api/v1/books")
   public String getData(@RequestParam Map<String, String> params) {
      String formattedText = "Mostrando %d elementos de la pagina %d";
      return String.format(formattedText, params.get("per_page"), params.get("page"));
   }
 ```
 
- - Los headers pueden accesarse igual que los parametros del query string, se
+<!-- tabs:start -->
+
+#### **Request**
+
+http://localhost:8080/api/v1/books?pagina=1&por_pagina=10
+
+```
+GET /api/v1/books?pagina=1&por_pagina=10 HTTP/1.1
+
+
+```
+
+#### **Response**
+
+```
+HTTP/1.1 200 OK
+Content-Type: text/plain
+Content-Length: 37
+
+Mostrando 10 elementos de la pagina 1
+```
+
+<!-- tabs:end -->
+
+4. Los headers pueden accesarse igual que los parametros del query string, se
  usa la anotación `@RequestHeader(<nombre>)` en un parametro de tipo String,
  si el tipo es diferente de String se aplica una conversión automatica. Si no se
  especifica un nombre de header y el tipo de dato del parametro del metodo
@@ -145,90 +292,121 @@ declarar un parametro de tipo `Map<String, String>` y la anotacion
  headers en ese parametro. Hay un tipo especial de Header que guarda una lista
  de cookies, se puede accesar a cada cookie con la anotación
  `@CookieValue(<nombre>)`.
-
- - Para accesar al body de la siguiente petición:
 ```
-  POST /api/v1/ruta HTTP/1.1
-  Host: localhost:8080
-  Content-Type: text/plain
-  Content-Length: 18
-
-  contenido del body
+GET /sample_page.html HTTP/1.1
+Host: www.example.org
+Content-Type: application/json
+Cookie: dark_mode=true; pagina=3; por_pagina=10
 ```
-Se debe anotar un parametro del **method handler** con la anotación
+
+5. Para accesar al body de la siguiente petición, se debe anotar un parametro del **method handler** con la anotación
 `@RequestBody` y spring leera el body lo deserializara dentro de un objeto
 del tipo que se especifique en el parametro:
 ```java
   @PostMapping("/api/v1/ruta")
   public String getData(@RequestBody String body) {
      // la variable <body> tiene el valor "contenido del body"
-     String formattedText = "Valor %s";
+     String formattedText = "Valor: %s";
      return String.format(formattedText, body);
   }
 ```
+
+<!-- tabs:start -->
+
+#### **Request**
+
+http://localhost:8080/api/v1/ruta
+
+```
+POST /api/v1/ruta HTTP/1.1
+Host: localhost:8080
+Content-Type: text/plain
+Content-Length: 18
+
+contenido del body
+```
+
+#### **Response**
+
+```
+HTTP/1.1 200 OK
+Content-Type: text/plain
+Content-Length: 25
+
+Valor: contenido del body
+```
+
+<!-- tabs:end -->
 Hay otro tipo de body usado especialmente cuando se envian archivos porque
 permite combinar los campos de archivo con campos de datos simples como texto,
 ese tipo de body se llama **multipart** y por ejemplo se puede generar con el
 siguiente formulario HTML un multipart con un texto y un archivo en la misma
 petición:
 ```html
-  <!DOCTYPE html>
-  <html>
-  <head><title>Formulario</title></head>
-  <body>
-    <form
-      method="POST"
-      action="/api/v1/ruta"
-      enctype="multipart/form-data">
-      <input type="text" name="nombre">
-      <input type="file" name="archivo">
-      <input type="submit">
-    </form>
-  </body>
-  </html>
+<!DOCTYPE html>
+<html>
+<head><title>Formulario</title></head>
+<body>
+  <form
+   method="POST"
+   action="/api/v1/ruta"
+   enctype="multipart/form-data">
+    <input type="text" name="nombre">
+    <input type="file" name="archivo">
+    <input type="submit">
+  </form>
+</body>
+</html>
 ```
 El formulario anterior genera la siguiente peticion HTTP (simplificada):
 ```
-   POST /api/v1/ruta HTTP/1.1
-   Host: localhost:8080
-   Content-Length: 288
-   Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryoqCCAZrc6DaOAXAN
-    
-   ------WebKitFormBoundaryoqCCAZrc6DaOAXAN
-   Content-Disposition: form-data; name="nombre"
+POST /api/v1/ruta HTTP/1.1
+Host: localhost:8080
+Content-Length: 288
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryoqCCAZrc6DaOAXAN
 
-   luis
-   ------WebKitFormBoundaryoqCCAZrc6DaOAXAN
-   Content-Disposition: form-data; name="archivo"; filename="documento.txt"
-   Content-Type: text/plain
+------WebKitFormBoundaryoqCCAZrc6DaOAXAN
+Content-Disposition: form-data; name="nombre"
 
-   contenido del archivo, solo una linea
-   ------WebKitFormBoundaryoqCCAZrc6DaOAXAN--
+luis
+------WebKitFormBoundaryoqCCAZrc6DaOAXAN
+Content-Disposition: form-data; name="archivo"; filename="documento.txt"
+Content-Type: text/plain
+
+contenido del archivo, solo una linea
+------WebKitFormBoundaryoqCCAZrc6DaOAXAN--
 ```
 Si el body de la peticion es **multipart**, se puede usar la
 anotación `@RequestParam(<nombre de parte>)`, se usa igual que request body.
 Si se quiere leer un body o una parte como archivo, se puede especificar la
 interface `MultipartFile` como tipo del parametro del method handler:
 ```java
-  @PostMapping("/api/v1/ruta")
-  public String getData(@RequestParam("nombre") String name, @RequestParam("archivo") MultipartFile file) {
-     String formattedText = "El nombre es %s, y el nombre del archivo es %s";
-     return String.format(formattedText, name, file.getName());
-  }
+@PostMapping("/api/v1/ruta")
+public String getData(@RequestParam("nombre") String name, @RequestParam("archivo") MultipartFile file) {
+  String formattedText = "El nombre es %s, y el nombre del archivo es %s";
+  return String.format(formattedText, name, file.getName());
+}
 ```
 Lo anterior devolvera una respuesta parecida a esta:
 ```
-   HTTP/1.1 200 OK
-   Content-Length: 59
-   Content-Type: text/plain
-    
-   El nombre es luis, y el nombre del archivo es documento.txt
+HTTP/1.1 200 OK
+Content-Length: 59
+Content-Type: text/plain
+
+El nombre es luis, y el nombre del archivo es documento.txt
 ```
 Si deseas acceder a la lista de todos los campos que sean alamacenados como
 texto se puede usar la anotacion `@RequestParam` sin especitcar un nombre de
 campo y usando el tipo de dato `Map<String, String>`. En cambio si se quiere
 acceder a todos los archivos del formulario solo cambias el tipo de dato a
 `Map<String, MultipartFile>` como tipo del parametro.
+
+### Resumen de anotaciones
+
+- RequestMapping: <Get|Post|Put|Delete>Mapping para cada verbo
+- RequestParam: se usa para acceder a un Query String o campo de formulario
+- RequestHeader y CookieValue: para acceder un header especifico o de cookie
+- RequestBody: Para **parsear** completamente el contenido del body
 
 ## Mapeando metodos HTTP
 
@@ -256,24 +434,6 @@ public String getData(
 ) {
   String formattedText = "La edad de %s es %d";
   return String.format(formattedText, name, age);
-}
-```
-
-## Parametros HTTP
-
-Los parametros HTTP son los variables que se pueden incluir al final de
-una URL despues del signo `?`, ejemplo:
-`https://www.google.com/search?q=spring+framework&sourceid=chrome`. Las
-q y sourceid en Spring Boot se extraen con la anotacion `@ParamRequest`:
-
-```java
-@GetMapping("search")
-public String getData(
-  @RequestParam("q", defaultValue="Hello") String query,
-  @RequestParam("sourceid", defaultValue="World") String browserName
-) {
-  String formattedText = "Buscando %s desde %s";
-  return String.format(formattedText, query, browserName);
 }
 ```
 
@@ -307,7 +467,7 @@ Para poder acceder al cuerpo de una solicitud en Spring se usa la anotación
 coinciden en el nombre:
 
 ```java
-@PostMapping("/books", produces = "application/json")
+@PostMapping("/books")
 public Book addBook(@RequestBody Book book) {
   return addNewBook(book);
 }
@@ -321,7 +481,7 @@ equivalente a la aneterior, solo que ya se puede acceder a todos los datos de la
 petición:
 
 ```java
-@PostMapping("/books", produces = "application/json")
+@PostMapping("/books")
 public Book addBook(HttpEntity<Book> entity) {
   entity.getHeaders();
   entity.hasBody();
@@ -336,7 +496,7 @@ en el method handler que se convierte a un formato que pueda ser escrito en el
 body, los headers y linea de inicio son generados automaticamente:
 
 ```java
-@GetMapping("/books", produces = "application/json")
+@GetMapping("/books")
 public Book getBooks() {
   return new Book();
 }
@@ -358,6 +518,17 @@ public ResponseEntity<String> handle() {
 }
 ```
 
+Resultado:
+
+```Response
+HTTP/1.1 201 Created
+MyResponseHeader: MyValue
+Content-Type: text/plain
+Content-Length: 11
+
+Hello World
+```
+
 ## Conversiones de tipos complejos
 
 Al decir tipo complejo es hablar de tipos de datos que no son simples como
@@ -366,18 +537,101 @@ List<T> o Map<K,V>, se refiere a otro tipo de datos o clases que podemos
 generar mientras programamos.
 
 Por ejemplo, podemos trabajar con objetos que representan la informacion de los usuarios
-de nuestro backend y posiblemente tendremos una clase como la siguiente:
+de nuestro backend y posiblemente tendremos las siguientes clases:
+
+<!-- tabs:start -->
+
+#### **Api.java**
+
+src/main/java/package
+
+```java
+@RestController
+@RequestMapping("/api/v1")
+public class Api {
+
+  @PostMapping("/users")
+  public String addUser(@RequestBody User user) {
+    return "Se agrego el usuario " + user.getFirstName();
+  }
+
+  // forma alternativa de recibir los datos
+  @PostMapping("/users")
+  public String addUser(@RequestBody Map<String, Object> map) {
+    return "Se agrego el usuario " + map.get("firstName"));
+  }
+}
+```
+
+#### **User.java**
+
+src/main/java/package
 
 ```java
 public class User {
   private String firstName;
   private String lastName;
-  private int age;
+  private Integer age;
   private String email;
   
-  // setter y getters por cada campo
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
+  
+  public String getFirstName() {
+    return this.firstName;
+  }
+  
+  public void setLastName(String lastName) {
+    this.lastName = lastName;
+  }
+  
+  public String getLastName() {
+    return this.lastName;
+  }
+  
+  public void setAge(Integer age) {
+    this.age = age;
+  }
+  
+  public Integer getAge() {
+    return this.age;
+  }
+  
+  public void setEmail(String email) {
+    this.lastName = lastName;
+  }
+  
+  public String getEmail() {
+    return this.email;
+  }
 }
 ```
+
+#### **Request/Response**
+
+```
+POST /api/v1/users HTTP/1.1
+Content-Type: application/json
+Content-Length: 88
+
+{
+  "firstName": "Juan",
+  "lastName": "Diaz",
+  "age": 18
+  "email": "juan@gmail.com"
+}
+```
+
+```
+HTTP/1.1 200 OK
+Content-Type: text/plain
+Content-Length: 25
+
+Se agrego el usuario Juan
+```
+
+<!-- tabs:end -->
 
 Spring usa la reflexion para generar la estructura de un json/xml para todos
 los campos que tengan generado apropiadamente sus getters/setters haciendo una
@@ -385,44 +639,190 @@ conversion automatica hacia o desde json/xml cuando lee datos del body de una
 peticion HTTP `@RequestBody` o cuando genera el body una respuesta HTTP
 `@ResponseBody`.
 
-Entonces si el cliente envia una peticion como esta:
-
-```
-POST /api/v1/users HTTP/1.1
-Content-Type: application/json
-Content-Length: 72
-Accept: application/json
-
-{
-  "firstName": "",
-  "lastName": "",
-  "age": 18
-  "email": ""
-}
-```
-
-El body anterior se puede interpretar como un clave valor Map<String, Object>
-en un method handler como el que sigue:
-
-```java
-@PostMapping("/api/v1/users")
-public String addUser(@RequestBody Map<String, Object> user) {
-  return user.get("firstName");
-}
-```
-
+El body se puede interpretar como un clave valor Map<String, Object>.
 Se usa como clave String porque en JSON siempre en la clave se usa un dato
 String mientras que para el valor se usa el tipo Object para indicar que
 puede ser de cualquier tipo: Integer, String, Boolean, Double, List, Map, etc.
 
-Pero tambien se puede decir que el tipo de dato es User:
+En el ejemplo anterior, con la anotacion @RequestBody se pude **parsear** el
+**body** de un **request**. Pero igualmente al retornar cualquier tipo desde
+un method handler, el objeto se codifica en su representacion equivalente a JSON
+como en el siguiente ejemplo:
+
+<!-- tabs:start -->
+
+#### **Api.java**
+
+src/main/java/package
 
 ```java
-@PostMapping("/api/v1/users")
-public String addUser(@RequestBody User user) {
-  return user.getFirstName();
+@RestController
+@RequestMapping("/api/v1")
+public class Api {
+
+  @GetMapping("/company")
+  public Company getCompanyInfo() {
+    return new Company(
+            "Google",
+            new StreetAddress("Centro", 12, "12345"),
+            List.of(
+                    new Employee(1, "Juan", 49000.99),
+                    new Employee(2, "Maria", 49000.99),
+                    new Employee(3, "Pablo", 49000.99)
+            )
+    );
+  }
 }
 ```
+
+#### **Company.java**
+
+src/main/java/package
+
+```java
+public class Company {
+  private String companyName;
+  private StreetAddress streetAddress;
+  private List<Employee> employees;
+  
+  public void setCompanyName(String companyName) {
+    this.companyName = companyName;
+  }
+  
+  public String getCompanyName() {
+    return this.companyName;
+  }
+  
+  public void setStreetAddress(StreetAddress streetAddress) {
+    this.streetAddress = streetAddress;
+  }
+  
+  public StreetAddress getStreetAddress() {
+    return this.streetAddress;
+  }
+  
+  public void setEmployees(List<Employee> employees) {
+    this.employees = employees;
+  }
+  
+  public List<Employee> getEmployees() {
+    return this.employees;
+  }
+}
+```
+
+#### **StreetAddress.java**
+
+src/main/java/package
+
+```java
+public class StreetAddress {
+  private String streetName;
+  private Integer streetNumber;
+  private String zip;
+  
+  public void setStreetName(String streetName) {
+    this.streetName = streetName;
+  }
+  
+  public String getStreetName() {
+    return this.streetName;
+  }
+  
+  public void setStreetNumber(Integer streetNumber) {
+    this.streetNumber = streetNumber;
+  }
+  
+  public Integer getStreetNumber() {
+    return this.streetNumber;
+  }
+  
+  public void setZip(String zip) {
+    this.zip = zip;
+  }
+  
+  public String getZip() {
+    return this.zip;
+  }
+}
+```
+
+#### **Employee.java**
+
+src/main/java/package
+
+```java
+public class Employee {
+  private Integer employeeId;
+  private String name;
+  private Double salary;
+  
+  public void setEmployeeId(Integer employeeId) {
+    this.employeeId = employeeId;
+  }
+  
+  public Integer getEmployeeId() {
+    return this.employeeId;
+  }
+  
+  public void setName(String name) {
+    this.name = name;
+  }
+  
+  public String getName() {
+    return this.name;
+  }
+  
+  public void setSalary(Double salary) {
+    this.salary = salary;
+  }
+  
+  public Double getSalary() {
+    return this.salary;
+  }
+}
+```
+
+#### **Request/Response**
+
+```
+GET /api/v1/company HTTP/1.1
+
+```
+
+```
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 396
+
+{
+  "companyName": "Google",
+  "streetAddress": {
+    "streetName": "Centro",
+    "streetNumber": 12,
+    "zip": "12345"
+  },
+  "employees": [
+    {
+      "employeeId": 1,
+      "name": "Juan",
+      "salary": 49000.99
+    },
+    {
+      "employeeId": 2,
+      "name": "Maria",
+      "salary": 49000.99
+    },
+    {
+      "employeeId": 3,
+      "name": "Pablo",
+      "salary": 49000.99
+    }
+  ]
+}
+```
+
+<!-- tabs:end -->
 
 ## Consumiendo la API
 
