@@ -1,5 +1,22 @@
 # Cheat Sheet
 
+## git
+
+Git stash: para cambios sin confirmar cuando se cambia de rama, se actualiza
+de un remoto, acciones que entran en conflicto con los cambios, el espacio
+usado por git stash le llama `WIP` (work in progress).
+
+```bash
+git stash push # agrega los cambios como WIP al stack; "push" es opcional
+git stash pop # elimina el ultimo WIP y lo aplica;
+git stash apply # aplica el WIP pero no lo elimina del stack
+git stash push -- <filename> # agregar archivo especifico; "push" es opcional
+git stash show stash@{index}
+git checkout stash@{<index>} -- <filename> # unstash opcion 1
+git restore --source=stash@{<index>} -- <filename> # unstash opcion 2
+git stash apply "stash@{2}"
+```
+
 ## Backup/Restore de una base de datos MySQL
 
 Creacion de una base de datos:
@@ -43,4 +60,3 @@ ssh-keygen -t rsa -b 4096 -C "email"
 # gitlab
 ssh-keygen -t rsa -b 2048 -C "email"
 ```
-
