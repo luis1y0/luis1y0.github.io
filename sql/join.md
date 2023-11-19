@@ -26,6 +26,10 @@ Obtener la region a la que pertenece un pais:
     .sql-cell {
       /*color: #40916c;*/
     }
+    img {
+      background-color: cadetblue;
+      border-radius: 10%;
+    }
   </style>
 <table>
   <style>
