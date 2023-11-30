@@ -52,6 +52,25 @@ sudo usermod -aG docker $USER
 newgrp docker # se usa para efectuar los cambios de grupos sin cerrar sesion en el sistema
 ```
 
+Ejecutar contenedor con usuario equivalente al sistema host:
+
+```
+FROM ubuntu:latest
+ARG HOST_NAME=server
+
+ARG USER_ID=1000
+ARG GROUP_ID=1000
+RUN groupadd -g $GROUP_ID luis && useradd -u $USER_ID -g $GROUP_ID -m -s /bin/bash [user]
+
+ENV HOME /home/[user]
+
+USER [user]
+
+WORKDIR /home/[user]
+
+CMD ["bash"]
+```
+
 ## Creacion de claves ssh para Github/Gitlab
 
 ```bash
