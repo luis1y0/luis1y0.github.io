@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="-200 -200 400 400">
+  <style>
+    .label { font: bold 16px sans-serif; text-anchor: middle; dominant-baseline: central; }
+    .rect-main { fill: #87CEFA; stroke: black; stroke-width: 2; }
+    .rect-ghost { fill: none; stroke: black; stroke-width: 2; stroke-dasharray: 5,5; }
+    .arrow { stroke: black; stroke-width: 2; marker-end: url(#arrowhead); }
+  </style>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" 
+      refX="5" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="black" />
+    </marker>
+  </defs>
+
+  <!-- Title -->
+  <text x="0" y="-170" font-size="18" font-weight="bold" text-anchor="middle">Animation&lt;Offset&gt;</text>
+  <text x="0" y="-150" font-size="16" font-weight="bold" text-anchor="middle">SlideTransition</text>
+
+  <!-- Arrows -->
+  <line class="arrow" x1="0" y1="0" x2="55" y2="0" />
+  <line class="arrow" x1="0" y1="0" x2="-55" y2="0" />
+  <line class="arrow" x1="0" y1="0" x2="0" y2="55" />
+  <line class="arrow" x1="0" y1="0" x2="0" y2="-55" />
+
+  <!-- Main box -->
+  <rect class="rect-main" x="-25" y="-25" width="50" height="50" />
+  <text class="label" x="0" y="0">(0, 0)</text>
+
+  <!-- Ghost boxes -->
+  <rect class="rect-ghost" x="75" y="-25" width="50" height="50" />
+  <text class="label" x="100" y="0">(1, 0)</text>
+
+  <rect class="rect-ghost" x="-125" y="-25" width="50" height="50" />
+  <text class="label" x="-100" y="0">(-1, 0)</text>
+
+  <rect class="rect-ghost" x="-25" y="75" width="50" height="50" />
+  <text class="label" x="0" y="100">(0, 1)</text>
+
+  <rect class="rect-ghost" x="-25" y="-125" width="50" height="50" />
+  <text class="label" x="0" y="-100">(0, -1)</text>
+</svg>
