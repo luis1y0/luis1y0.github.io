@@ -18,6 +18,19 @@ Animation<Offset> position = animation.drive(Tween<Offset>(
 ));
 ```
 
+```dart
+AnimationController _controller = AnimationController(
+  vsync: this, // the SingleTickerProviderStateMixin
+  duration: const Duration(seconds: 1),
+);
+Animation<Offset> position = _controller.drive(Tween<Offset>(
+  begin: Offset(-1.0, 0.0),
+  end: const Offset(0.0, 0.0),
+));
+_controller.forward();
+_controller.reverse();
+```
+
 ## Transition
 
 En el widget `SlideTransition` los valores 0 en offset significan que no hay
